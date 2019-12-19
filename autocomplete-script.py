@@ -6,7 +6,7 @@ import tqdm
 
 def get_ranks_for_letter(lang, n, df):
     ranks = []
-    suggestionUrl = 'http://autocomplete.belvilla.net/v2/search?'
+    suggestionUrl = 'URL'
 
     for kw in tqdm.tqdm(df[list(df)[0]]):
         query = kw[:n]
