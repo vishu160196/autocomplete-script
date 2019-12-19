@@ -3,14 +3,16 @@ import argparse
 import pandas as pd
 import tqdm
 
+global args
+
 
 def get_ranks_for_letter(lang, n, df):
     ranks = []
-    suggestionUrl = 'URL'
+    suggestion_url = args.url
 
     for kw in tqdm.tqdm(df[list(df)[0]]):
         query = kw[:n]
-        res = requests.get(suggestionUrl + 'language=' + lang + '&query=' + query).json()
+        res = requests.get(suggestion_url + 'language=' + lang + '&query=' + query).json()
 
         suggestions = res['responseObject']
         rank = '-'
@@ -44,7 +46,9 @@ def main():
     parser.add_argument('--file', help='csv file containing keywords')
     parser.add_argument('--letters', help='comma separated list of numbers')
     parser.add_argument('--languages', help='domains to get suggestion - en, nl')
+    parser.add_argument('--url', help='autocomplete API')
 
+    global args
     args = parser.parse_args()
     if not args.file or not args.languages or not args.letters:
         print("One or more arguments missing, use -h to display the required arguments")
