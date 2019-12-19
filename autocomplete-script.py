@@ -69,7 +69,7 @@ def main():
     for domain in domains_list:
         print("now processing language:" + domain + "\n")
         df = pd.concat((df, get_ranks(domain, letters_list, df)), axis=1)
-        print("language " + domain + "finished")
+        print("language " + domain + " finished")
 
     df.to_csv("./autocomplete-rankings.csv")
 
