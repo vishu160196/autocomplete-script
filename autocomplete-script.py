@@ -1,21 +1,26 @@
 import requests
 import argparse
 import pandas as pd
+import tqdm
 
 
 def get_ranks_for_letter(lang, n, df):
     ranks = []
     suggestionUrl = 'http://autocomplete.belvilla.net/v2/search?'
-    for i, kw in enumerate(df[list(df)[0]]):
+
+    for kw in tqdm.tqdm(df[list(df)[0]]):
         query = kw[:n]
         res = requests.get(suggestionUrl + 'language=' + lang + '&query=' + query).json()
 
         suggestions = res['responseObject']
         rank = '-'
         for i, s in enumerate(suggestions):
-            if s['displayName'].lower() == kw.lower():
-                rank = i + 1
-                break
+            try:
+                if s['displayName'].lower() == kw.lower():
+                    rank = i + 1
+                    break
+            except KeyError:
+                print("\nNo display name found for one suggestion in:\nquery: " + query + "\nkeyword: " + kw + "\n")
         ranks.append(rank)
 
     return ranks
@@ -26,7 +31,9 @@ def get_ranks(domain, letters_list, df):
 
     columns = {}
     for n in letters_list:
+        print("\tprocessing for " + str(n) + " letter queries")
         columns[language + '_' + str(n)] = get_ranks_for_letter(language, int(n), df)
+        print("\tfinsihed")
 
     df_domain = pd.DataFrame(columns)
     return df_domain
@@ -60,7 +67,9 @@ def main():
     domains_list = args.languages.split(',')
 
     for domain in domains_list:
+        print("now processing language:" + domain + "\n")
         df = pd.concat((df, get_ranks(domain, letters_list, df)), axis=1)
+        print("language " + domain + "finished")
 
     df.to_csv("./autocomplete-rankings.csv")
 
